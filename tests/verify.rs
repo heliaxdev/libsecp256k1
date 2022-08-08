@@ -174,13 +174,13 @@ fn test_verify() {
 
     secp256k1.verify(&message, &signature, &pubkey).unwrap();
     assert!(verify(&ctx_message, &ctx_sig, &ctx_pubkey));
-    let mut f_ctx_sig = ctx_sig;
+    let mut f_ctx_sig = ctx_sig.clone();
     f_ctx_sig.r.set_int(0);
     if f_ctx_sig.r != ctx_sig.r {
         assert!(!ECMULT_CONTEXT.verify_raw(
             &f_ctx_sig.r,
             &ctx_sig.s,
-            &ctx_pubkey.into(),
+            &ctx_pubkey.clone().into(),
             &ctx_message.0
         ));
     }
@@ -189,7 +189,7 @@ fn test_verify() {
         assert!(!ECMULT_CONTEXT.verify_raw(
             &f_ctx_sig.r,
             &ctx_sig.s,
-            &ctx_pubkey.into(),
+            &ctx_pubkey.clone().into(),
             &ctx_message.0
         ));
     }

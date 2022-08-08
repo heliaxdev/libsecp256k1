@@ -14,7 +14,7 @@ impl ECMultContext {
         let mut digest: D = Default::default();
 
         let mut pt = *point;
-        let s = *scalar;
+        let s = scalar.clone();
 
         if s.is_zero() {
             return None;

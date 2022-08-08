@@ -338,7 +338,7 @@ fn table_get_ge_storage(r: &mut Affine, pre: &[AffineStorage], n: i32, w: usize)
 }
 
 pub fn ecmult_wnaf(wnaf: &mut [i32], a: &Scalar, w: usize) -> i32 {
-    let mut s = *a;
+    let mut s = a.clone();
     let mut last_set_bit: i32 = -1;
     let mut bit = 0;
     let mut sign = 1;
@@ -392,7 +392,7 @@ pub fn ecmult_wnaf(wnaf: &mut [i32], a: &Scalar, w: usize) -> i32 {
 }
 
 pub fn ecmult_wnaf_const(wnaf: &mut [i32], a: &Scalar, w: usize) -> i32 {
-    let mut s = *a;
+    let mut s = a.clone();
     let mut word = 0;
 
     /* Note that we cannot handle even numbers by negating them to be
@@ -413,7 +413,7 @@ pub fn ecmult_wnaf_const(wnaf: &mut [i32], a: &Scalar, w: usize) -> i32 {
     let bit = flip ^ !s.is_even();
     /* We add 1 to even numbers, 2 to odd ones, noting that negation
      * flips parity */
-    let neg_s = -s;
+    let neg_s = -s.clone();
     let not_neg_one = !neg_s.is_one();
     s.cadd_bit(if bit { 1 } else { 0 }, not_neg_one);
     /* If we had negative one, flip == 1, s.d[0] == 0, bit == 1, so
@@ -497,7 +497,7 @@ impl ECMultContext {
 
         let mut wnaf_1 = [0i32; 1 + WNAF_SIZE];
 
-        let sc = *scalar;
+        let sc = scalar.clone();
         let skew_1 = ecmult_wnaf_const(&mut wnaf_1, &sc, WINDOW_A - 1);
 
         /* Calculate odd multiples of a.  All multiples are brought to
