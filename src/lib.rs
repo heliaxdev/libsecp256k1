@@ -442,6 +442,16 @@ impl SecretKey {
     pub fn inv(&self) -> Self {
         SecretKey(self.0.inv())
     }
+
+    pub fn to_scalar_ref(&mut self) -> &mut Scalar {
+        &mut self.0
+    }
+
+    pub fn clear_data(&mut self) {
+        let thing = self.to_scalar_ref();
+        thing.clear();
+    }
+    
 }
 
 impl Default for SecretKey {
