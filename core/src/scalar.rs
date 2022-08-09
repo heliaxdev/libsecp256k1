@@ -29,11 +29,11 @@ impl Drop for Scalar {
     fn drop(&mut self) {
         println!("Dropping libsecp256k1::Scalar");
         println!("Initial scalar is {:?}",self.0);
-        println!("Data at memory location is {:?}",unsafe {core::slice::from_raw_parts(self.0.as_ptr(), 8)});
+        println!("Data at memory location is {:?}\n",unsafe {core::slice::from_raw_parts(self.0.as_ptr(), 8)});
         println!("Clearing");
         self.clear();
-        println!("Cleared");
-        println!("Data at memory location is {:?}\n",unsafe {core::slice::from_raw_parts(self.0.as_ptr(), 8)});
+        println!("Cleared\n");
+        println!("Data at memory location is {:?}",unsafe {core::slice::from_raw_parts(self.0.as_ptr(), 8)});
         println!("Scalar is now {:?}", self.0);
         println!("exiting Drop for Scalar\n");
     }
