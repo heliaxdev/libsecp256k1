@@ -64,7 +64,7 @@ pub struct PublicKey(Affine);
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 /// Secret key (256-bit) on a secp256k1 curve.
-pub struct SecretKey(Scalar);
+pub struct SecretKey(Box<Scalar>);
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 /// An ECDSA signature.
@@ -422,11 +422,11 @@ impl SecretKey {
     }
 
     pub fn tweak_add_assign(&mut self, tweak: &SecretKey) -> Result<(), Error> {
-        let v = self.0.clone() + tweak.0.clone();
+        let v = (*self.0).clone() + (*tweak.0).clone();
         if v.is_zero() {
             return Err(Error::TweakOutOfRange);
         }
-        self.0 = v;
+        self.0 = Box::new(v);
         Ok(())
     }
 
@@ -434,17 +434,18 @@ impl SecretKey {
         if tweak.0.is_zero() {
             return Err(Error::TweakOutOfRange);
         }
-
-        self.0 *= &tweak.0;
+        let v = (*self.0).clone() * (*tweak.0).clone();
+        self.0 = Box::new(v);
         Ok(())
     }
 
     pub fn inv(&self) -> Self {
-        SecretKey(self.0.inv())
+        let v = (*self.0).inv();
+        SecretKey(Box::new(v))
     }
 
     pub fn to_scalar_ref(&mut self) -> &mut Scalar {
-        println!("getting scalar ref");
+        // println!("getting scalar ref");
         &mut self.0
     }
 
@@ -455,7 +456,7 @@ impl SecretKey {
     }
 
     pub fn as_bytes(&mut self) -> &[u32; 8] {
-        println!("getting as bytes");
+        // println!("getting as bytes");
         &self.to_scalar_ref().0
     }
 
@@ -471,19 +472,20 @@ impl Default for SecretKey {
         ]));
         debug_assert!(!overflowed);
         debug_assert!(!elem.is_zero());
-        SecretKey(elem)
+        SecretKey(Box::new(elem))
     }
 }
 
 impl Drop for SecretKey {
     fn drop(&mut self) {
-        self.0.clear();
+        println!("Dropping libsecp256k1::SecretKey with data {:?}",self.0);
+        println!("Data at memory location is {:?}\n",unsafe {core::slice::from_raw_parts((*self.0).0.as_ptr(), 8)});
     }
 }
 
 impl Into<Scalar> for SecretKey {
     fn into(self) -> Scalar {
-        self.0.clone()
+        *self.0.clone()
     }
 }
 
@@ -494,7 +496,7 @@ impl TryFrom<Scalar> for SecretKey {
         if scalar.is_zero() {
             Err(Error::InvalidSecretKey)
         } else {
-            Ok(Self(scalar))
+            Ok(Self(Box::new(scalar)))
         }
     }
 }
@@ -503,7 +505,7 @@ impl core::fmt::LowerHex for SecretKey {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let scalar = self.0.clone();
 
-        write!(f, "{:x}", scalar)
+        write!(f, "{:x}", *scalar)
     }
 }
 
