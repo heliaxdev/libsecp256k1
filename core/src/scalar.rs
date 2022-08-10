@@ -27,26 +27,16 @@ pub struct Scalar(pub [u32; 8]);
 
 impl Drop for Scalar {
     fn drop(&mut self) {
-        println!("Dropping libsecp256k1::Scalar");
-        println!("Initial scalar is {:?}",self.0);
-        println!("Data at memory location is {:?}\n",unsafe {core::slice::from_raw_parts(self.0.as_ptr(), 8)});
-        println!("Clearing");
         self.clear();
-        println!("Cleared\n");
-        println!("Data at memory location is {:?}",unsafe {core::slice::from_raw_parts(self.0.as_ptr(), 8)});
-        println!("Scalar is now {:?}", self.0);
-        println!("exiting Drop for Scalar\n");
     }
 }
 
 impl Scalar {
     /// Clear a scalar to prevent the leak of sensitive data.
     pub fn clear(&mut self) {
-        println!("doing volatile write of data {:?}",self.0);
         unsafe {
             core::ptr::write_volatile(&mut self.0, [0u32; 8]);
         }
-        println!("done volatile write");
     }
 
     /// Set a scalar to an unsigned integer.

@@ -445,7 +445,6 @@ impl SecretKey {
     }
 
     pub fn to_scalar_ref(&mut self) -> &mut Scalar {
-        // println!("getting scalar ref");
         &mut self.0
     }
 
@@ -462,13 +461,6 @@ impl Default for SecretKey {
         debug_assert!(!overflowed);
         debug_assert!(!elem.is_zero());
         SecretKey(elem)
-    }
-}
-
-impl Drop for SecretKey {
-    fn drop(&mut self) {
-        println!("Dropping libsecp256k1::SecretKey with data {:?}",self.0);
-        println!("Data at memory location is {:?}\n",unsafe {core::slice::from_raw_parts(self.0.0.as_ptr(), 8)});
     }
 }
 
