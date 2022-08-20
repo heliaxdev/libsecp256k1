@@ -442,6 +442,10 @@ impl SecretKey {
     pub fn inv(&self) -> Self {
         SecretKey(self.0.inv())
     }
+
+    pub fn to_scalar_ref(&mut self) -> &Scalar {
+        &mut self.0
+    }
 }
 
 impl Default for SecretKey {
