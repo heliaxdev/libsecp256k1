@@ -62,11 +62,11 @@ pub static ECMULT_GEN_CONTEXT: ECMultGenContext =
 /// Public key on a secp256k1 curve.
 pub struct PublicKey(Affine);
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 /// Secret key (256-bit) on a secp256k1 curve.
 pub struct SecretKey(Scalar);
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 /// An ECDSA signature.
 pub struct Signature {
     pub r: Scalar,
@@ -77,7 +77,7 @@ pub struct Signature {
 /// Tag used for public key recovery from signatures.
 pub struct RecoveryId(u8);
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 /// Hashed message input to an ECDSA signature.
 pub struct Message(pub Scalar);
 
@@ -422,7 +422,7 @@ impl SecretKey {
     }
 
     pub fn tweak_add_assign(&mut self, tweak: &SecretKey) -> Result<(), Error> {
-        let v = self.0 + tweak.0;
+        let v = self.0.clone() + tweak.0.clone();
         if v.is_zero() {
             return Err(Error::TweakOutOfRange);
         }
@@ -478,7 +478,7 @@ impl TryFrom<Scalar> for SecretKey {
 
 impl core::fmt::LowerHex for SecretKey {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        let scalar = self.0;
+        let scalar = self.0.clone();
 
         write!(f, "{:x}", scalar)
     }
@@ -605,7 +605,7 @@ impl Signature {
     /// which ensures that the s value lies in the lower half of its range.
     pub fn normalize_s(&mut self) {
         if self.s.is_high() {
-            self.s = -self.s;
+            self.s = -self.s.clone();
         }
     }
 
